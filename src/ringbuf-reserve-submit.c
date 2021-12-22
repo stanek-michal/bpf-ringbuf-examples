@@ -39,7 +39,8 @@ static void sig_handler(int sig)
 
 int handle_event(void *ctx, void *data, size_t data_sz)
 {
-	const struct event *e = data;
+	struct event *e = data;
+	struct event *e_big;
 	struct tm *tm;
 	char ts[32];
 	time_t t;
@@ -47,8 +48,16 @@ int handle_event(void *ctx, void *data, size_t data_sz)
 	time(&t);
 	tm = localtime(&t);
 	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
+	if (e->is_big)
+	{
+		e_big = data;
+		printf("%-8s %-5s %-7d %-16s %s\n", ts, "EXEC", e_big->pid, e_big->comm, e_big->filename);
+	}
+	else
+	{
+		printf("%-8s %-5s %-7d %-16s %s\n", ts, "EXEC", e->pid, e->comm, e->filename);
+	}
 
-	printf("%-8s %-5s %-7d %-16s %s\n", ts, "EXEC", e->pid, e->comm, e->filename);
 
 	return 0;
 }
